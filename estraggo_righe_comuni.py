@@ -1,5 +1,10 @@
 import pandas as pd
 
+
+# DA FIXARE IL PROBLEMA DEI PUNTEGGI DI ANYBURL-RE
+
+
+
 # OBIETTIVI DI QUESTO FILE:
 # 1) Individuare, per ogni fatto di test nei 4 dataset, la differenza di head rank e tail rank  sulla versione "filtrata"
 # rispetto alla versione "originale" nei 4 modelli
@@ -7,9 +12,9 @@ import pandas as pd
 
 
 def find_worst(set, data):
-    df = pd.read_csv('data/' + set[0] + '/'+ data + '/complex_filtered_ranks.csv', sep=';',
+    df = pd.read_csv('data/' + set[0] + '/'+ data + '/' + data.lower() + '_filtered_ranks.csv', sep=';',
                      names=['head', 'relation', 'tail', 'head_rank', 'tail_rank'])
-    df2 = pd.read_csv('data/' + set[1] + '/' + data + '/complex_filtered_ranks.csv', sep=';',
+    df2 = pd.read_csv('data/' + set[1] + '/' + data + '/' + data.lower() + '_filtered_ranks.csv', sep=';',
                       names=['head', 'relation', 'tail', 'head_rank_2', 'tail_rank_2'])
     # prendo solo l'intersezione dei due dataframe, in modo che ho solo i fatti presenti nel KG filtrato
     intersection = pd.merge(df, df2, how='inner', on=['head', 'relation', 'tail'])
@@ -17,13 +22,13 @@ def find_worst(set, data):
     different_ranks = intersection[(intersection['head_rank'] != intersection['head_rank_2']) | (
                 intersection['tail_rank'] != intersection['tail_rank_2'])]
     # si crea una colonna con la differenza e si ordina in base a quella
-    different_ranks['score_diff_head'] = different_ranks['head_rank2'] - different_ranks['head_rank']
-    different_ranks['score_diff_tail'] = different_ranks['tail_rank2'] - different_ranks['tail_rank']
+    different_ranks['score_diff_head'] = different_ranks['head_rank_2'] - different_ranks['head_rank']
+    different_ranks['score_diff_tail'] = different_ranks['tail_rank_2'] - different_ranks['tail_rank']
 
     # Il nuovo dataframe avrà le prime 20 righe con la differenza maggiore nei rank di head e tail
     different_ranks.sort_values(['score_diff_head','score_diff_tail'] , ascending=[False, False])
     worst_ranks_df = df.head(20)
-    worst_ranks_df .to_csv("output/" + set[1] + "/" + data + '/worst_ranks.csv')
+    worst_ranks_df.to_csv("output/" + set[1] + "/" + data + '/worst_ranks.csv', sep=";", index=False)
     # serieDifferenze_tail = different_ranks['tail_rank_2'] - different_ranks['tail_rank']  # faccio la differenza tra il tail rank del KG filtrato meno il tail rank del KG non filtrato
     # stdTail = pd.DataFrame.std(different_ranks['tail_rank_2'] - different_ranks['tail_rank'])  # calcolo la deviazione standard
     # worst_result_tail = serieDifferenze_tail[
