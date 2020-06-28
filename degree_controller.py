@@ -41,7 +41,7 @@ serieDifferenze_head = different_ranks['head_rank_2'] - different_ranks['head_ra
 std_head = pd.DataFrame.std(different_ranks['head_rank_2'] - different_ranks['head_rank'])
 worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head]
 print(worst_result_head.shape[0])
-print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.index.tolist(),:],df_train))
+print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)) #prendo da intersection le righe peggiori
 worst_result_tail = worst_result_tail.sort_values(ascending=False)
 worst_result_head = worst_result_head.sort_values(ascending=False)
 worst_result_head = worst_result_head.sample(n=200)
