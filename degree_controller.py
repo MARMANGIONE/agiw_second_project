@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import dfs_portatile
+import check_reverse_fact
 df = pd.read_csv('data/FB15k/ComplEx/complex_filtered_ranks.csv', sep=';',
                  names=['head', 'relation', 'tail', 'head_rank', 'tail_rank'])
 df2 = pd.read_csv('data/FB15k-237/ComplEx/complex_filtered_ranks.csv', sep=';',
@@ -39,6 +40,8 @@ worst_result_tail = serieDifferenze_tail[
 serieDifferenze_head = different_ranks['head_rank_2'] - different_ranks['head_rank']
 std_head = pd.DataFrame.std(different_ranks['head_rank_2'] - different_ranks['head_rank'])
 worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head]
+print(worst_result_head.shape[0])
+print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.index.tolist(),:],df_train))
 worst_result_tail = worst_result_tail.sort_values(ascending=False)
 worst_result_head = worst_result_head.sort_values(ascending=False)
 worst_result_head = worst_result_head.sample(n=200)
