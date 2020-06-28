@@ -3,24 +3,46 @@
 
 import pandas as pd
 from datetime import datetime
-
+import os.path
 starttime = datetime.now()
-df = pd.read_csv('data/FB15k/train_FB15k.csv', sep='\t', names=['head', 'relation', 'tail'])
-
-start = ('', '', '/m/07jq_')
-
-stop = ('', '', '/m/02bvt')
-
-start_reverse = (stop[2], stop[0], '')
-
-stop_reverse = (stop[2], start[0], '')
-paths = []
-visitati = []
-DEEPdfs = 2
-DEEPreversedfs = 2
 
 
-def dfs(df, start, end, path=[], depth=0, visited=[]):
+def creaInversi():
+    with open("data/FB15k-237/train_FB15k-237.csv") as f:
+        lines = f.readlines()
+    CSVinv = open("data/FB15k-237/train_FB15k-237-inv.csv", 'w')
+
+    for line in lines:
+        CSVinv.write(line)
+
+    lines = [x.strip() for x in lines]
+
+    for line in lines:
+        splitline = line.split('\t')
+        end = splitline[0] + '\n'
+        start = splitline[2] + '\t'
+        relation = 'INV::' + splitline[1] + '\t'
+        CSVinv.write(start + relation + end)
+    f.close()
+
+
+def partenza_dfs(head,tail,df,DEEPdfs,DEEPreversedfs):
+    if(not os.path.isfile("data/FB15k-237/train_FB15k-237-inv.csv")):
+        creaInversi()
+    df=pd.read_csv('data/FB15k-237/train_FB15k-237-inv.csv', sep='\t', names=['head', 'relation', 'tail'])
+    start = ('', '', head)
+    stop = ('', '', tail)
+    paths = []
+    visitati = []
+    dfs(df, start, stop,paths,DEEPdfs,visitati)
+
+    start_reverse = (stop[2], stop[0], '')
+    stop_reverse = (stop[2], start[0], '')
+    dfs_reverse(df, stop_reverse, start_reverse,paths,DEEPreversedfs,visitati)
+
+    return len(paths)
+
+def dfs(df, start, end,paths,DEEPdfs,visitati, path=[], depth=0, visited=[]):
     if start[2] == end[2]:
         paths.append(path + [start])
     if depth < DEEPdfs and start[2] not in visited:
@@ -32,7 +54,7 @@ def dfs(df, start, end, path=[], depth=0, visited=[]):
             if node not in path:
                 if (DEEPdfs == depth + 1):
                     visitati.append((node[2], path + [node]))
-                dfs(df, node, end, path, depth + 1, visited)
+                dfs(df, node, end,paths,DEEPdfs,visitati, path, depth + 1, visited)
 
 
 def childrens(df, start):
@@ -42,7 +64,7 @@ def childrens(df, start):
     return tuples
 
 
-def dfs_reverse(df, start, end, path=[], depth=0, visited=[]):
+def dfs_reverse(df, start, end,paths,DEEPreversedfs,visitati,path=[], depth=0, visited=[]):
     for tupla in visitati:
         if start[0] == tupla[0]:
             wholePath = tupla[1] + [start] + path
@@ -54,7 +76,7 @@ def dfs_reverse(df, start, end, path=[], depth=0, visited=[]):
             visited.append(start[0])
         for node in childrens_reverse(df, start[0]):
             if node not in path:
-                dfs_reverse(df, node, end, path, depth + 1, visited)
+                dfs_reverse(df, node, end,paths,DEEPreversedfs,visitati, path, depth + 1, visited)
 
 
 def childrens_reverse(df, start):
@@ -64,32 +86,7 @@ def childrens_reverse(df, start):
     return tuples
 
 
-def test_magic_dfs():
-    giusti = 0
-    sbagliati = 0
-    percorso_sbagliato = []
-    for path in paths:
-        for step in path:
-            tail = df[df['tail'] == step[2]]
-            head = tail[tail['head'] == step[0]]
-            relation = head[head['relation'] == step[1]]
-            if relation.size > 0 or step[1] == '':
-                giusti = giusti + 1
-            else:
-                sbagliati = sbagliati + 1
-                percorso_sbagliato = percorso_sbagliato + [path]
-                print(percorso_sbagliato)
-                print('giusti: ' + str(giusti) + '  |  sbagliati: ' + str(sbagliati))
 
 
-dfs(df, start, stop)
-print(len(paths))
-print('ho fatto un pezzo')
-print(len(visitati))
-dfs_reverse(df, stop_reverse, start_reverse)
-print(len(paths))
-with open("output/pathFB15k.txt", "w") as file:
-    file.write(str(paths))
-print('fatto')
-# test_magic_dfs()
-print(datetime.now() - starttime)
+
+
