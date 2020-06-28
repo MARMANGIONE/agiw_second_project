@@ -5,16 +5,11 @@ df=pd.read_csv('data/FB15k/ComplEx/complex_filtered_ranks.csv',sep=';',names=['h
 df2=pd.read_csv('data/FB15k-237/ComplEx/complex_filtered_ranks.csv',sep=';',names=['head','relation','tail','head_rank_2','tail_rank_2'])
 df_train237 = pd.read_csv('data/FB15k-237/train_FB15k-237.csv', sep='\t', names=['head', 'relation', 'tail'])
 df_train = pd.read_csv('data/FB15k/train_FB15k.csv', sep='\t', names=['head', 'relation', 'tail'])
-def degree_head(node):
-    return df_train[df_train['head'] == node].shape[0]
+def degree_node(node):
+    return df_train[df_train['head'] == node].shape[0] + df_train[df_train['tail'] == node].shape[0]
 
-def degree_tail(node):
-    return df_train[df_train['tail'] == node].shape[0]
-def degree_head_237(node):
-    return df_train237[df_train237['head'] == node].shape[0]
-
-def degree_tail_237(node):
-    return df_train237[df_train237['tail'] == node].shape[0]
+def degree_node_237(node):
+    return df_train237[df_train237['head'] == node].shape[0] + df_train237[df_train237['tail'] == node].shape[0]
 
 def recover_name_fb15k(node):
     html_doc = requests.get('https://cofactor.io/'+ node).text
@@ -36,7 +31,7 @@ worst_result_head=serieDifferenze_head[serieDifferenze_head>std_head]
 worst_result_tail=worst_result_tail.sort_values(ascending=False)
 worst_result_head=worst_result_head.sort_values(ascending=False)
 worst_result_head = worst_result_head.head(20)
-worst_result_tail= worst_result_tail.head(40)
+worst_result_tail= worst_result_tail.head(20)
 print(worst_result_tail)
 print(worst_result_head)
 index_list=worst_result_tail.index.values.tolist()
@@ -46,11 +41,11 @@ for index in index_list:
     relation=intersection.loc[ index, : ]['relation']
     nome_head=recover_name_fb15k(head)
     nome_tail=recover_name_fb15k(tail)
-    degreehead237=degree_head_237(head)
-    degreetail237=degree_tail_237(tail)
+    degreehead237=degree_node_237(head)
+    degreetail237=degree_node_237(tail)
     if(degreehead237!=0 and degreetail237!=0 and nome_head != '❔' and nome_tail != '❔'):
         print(index,'---', nome_head,'(',head,')','--->', degreehead237,'---',relation,'---', nome_tail,'(',tail,')','--->', degreetail237,'FB15k-237')
-        print(index, '---', nome_head,'(',head,')', '--->', degree_head(head), '---',relation,'---', nome_tail,'(',tail,')', '--->', degree_tail(tail),'FB15k')
+        print(index, '---', nome_head,'(',head,')', '--->', degree_node(head), '---',relation,'---', nome_tail,'(',tail,')', '--->', degree_node(tail),'FB15k')
         print(' ')
 #print(df_train237[df_train237['head'] == intersection.loc[17018, :]['head']].shape[0])
 #print(intersection.loc[ 17018, : ])

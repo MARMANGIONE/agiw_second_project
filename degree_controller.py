@@ -33,15 +33,21 @@ different_ranks = intersection[(intersection['head_rank'] != intersection['head_
 serieDifferenze_tail = different_ranks['tail_rank_2'] - different_ranks['tail_rank']  # faccio la differenza tra il tail rank del KG filtrato meno il tail rank del KG non filtrato
 stdTail = pd.DataFrame.std(
     different_ranks['tail_rank_2'] - different_ranks['tail_rank'])  # calcolo la deviazione standard
+meanTail = pd.DataFrame.mean(different_ranks['tail_rank_2'] - different_ranks['tail_rank'])
 worst_result_tail = serieDifferenze_tail[
-    serieDifferenze_tail > stdTail]  # prendo solo i punteggi che sono peggiorati maggiormente
+    serieDifferenze_tail > stdTail + meanTail]  # prendo solo i punteggi che sono peggiorati maggiormente
 
 # faccio lo stesso per le head
 serieDifferenze_head = different_ranks['head_rank_2'] - different_ranks['head_rank']
 std_head = pd.DataFrame.std(different_ranks['head_rank_2'] - different_ranks['head_rank'])
-worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head]
+mean_head = pd.DataFrame.mean(different_ranks['head_rank_2'] - different_ranks['head_rank'])
+worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head + mean_head]
 print(worst_result_head.shape[0])
 print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)) #prendo da intersection le righe peggiori
+# CONSIDERO SOLO I CASI PEGGIORI CHE NON HANNO L'INVERSA(Queste righe possono essere opportunamente commentate se si vogliono considerare anche i casi con inverso
+#  LO FACCIAMO PRIMA O DOPO IL SORT????
+worst_result_tail = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)
+worst_result_head = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_head.index.tolist(),:],df_train)
 worst_result_tail = worst_result_tail.sort_values(ascending=False)
 worst_result_head = worst_result_head.sort_values(ascending=False)
 worst_result_head = worst_result_head.sample(n=200)

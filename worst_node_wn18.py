@@ -8,23 +8,27 @@ df2=pd.read_csv('data/WN18RR/ComplEx/complex_filtered_ranks.csv',sep=';',names=[
 df_trainRR = pd.read_csv('data/WN18RR/train_WN18RR.csv', sep='\t', names=['head', 'relation', 'tail'])
 df_train = pd.read_csv('data/WN18/train_WN18.csv', sep='\t', names=['head', 'relation', 'tail'])
 
-def degree_head(node):
-    return df_train[df_train['head'] == node].shape[0]
 
-def degree_tail(node):
-    return df_train[df_train['tail'] == node].shape[0]
-def degree_head_RR(node):
-    return df_trainRR[df_trainRR['head'] == node].shape[0]
+# POICHE' IL GRAFO NON E' DIREZIONATO PER OGNI NODO IL GRADO SI CALCOLA OSSSERVANDO SIA GLI ARCHI ENTRANTI SIA GLI ARCHI USCENTI
+def degree_node(node):
+    degree_head = df_train[df_train['head'] == node].shape[0]
+    degree_tail = df_train[df_train['tail'] == node].shape[0]
+    return degree_head + degree_tail
 
-def degree_tail_RR(node):
-    return df_trainRR[df_trainRR['tail'] == node].shape[0]
+def degree_node_RR(node):
+    degree_head = df_trainRR[df_trainRR['head'] == node].shape[0]
+    degree_tail = df_trainRR[df_trainRR['tail'] == node].shape[0]
+    return degree_head + degree_tail
+
+
 
 def recover_name_wn(node):
     try:
-  #  if node != 144722:
+  # 00144722:
         node_name = wn.synset_from_pos_and_offset('n', node)._lemma_names[0]
         return node_name
-    except WordNetError:
+    except WordNetError as e:
+        print(e)
         print(node)
         pass
 
@@ -45,23 +49,27 @@ worst_result_head=serieDifferenze_head[serieDifferenze_head>std_head]
 worst_result_tail=worst_result_tail.sort_values(ascending=False)
 worst_result_head=worst_result_head.sort_values(ascending=False)
 worst_result_head = worst_result_head.head(20)
-worst_result_tail= worst_result_tail.head(40)
+worst_result_tail= worst_result_tail.head(20)
 print(worst_result_tail)
 print(worst_result_head)
 index_list=worst_result_tail.index.values.tolist()
+node_0_degree_set = set()
 for index in index_list:
     head=intersection.loc[ index, : ]['head']
     tail=intersection.loc[ index, : ]['tail']
     relation=intersection.loc[ index, : ]['relation']
     nome_head=recover_name_wn(head)
     nome_tail=recover_name_wn(tail)
-    degreeheadRR=degree_head_RR(head)
-    degreetailRR=degree_tail_RR(tail)
-    if(degreeheadRR!=0 and degreetailRR!=0 and nome_head != '❔' and nome_tail != '❔'):
+    degreeheadRR=degree_node_RR(head)
+    degreetailRR=degree_node_RR(tail)
+    if(degreeheadRR!=0 and degreetailRR!=0):
         print(index,'---', nome_head,'(',head,')','--->', degreeheadRR,'---',relation,'---', nome_tail,'(',tail,')','--->', degreetailRR,'WN18')
-        print(index, '---', nome_head,'(',head,')', '--->', degree_head(head), '---',relation,'---', nome_tail,'(',tail,')', '--->', degree_tail(tail),'WN18RR')
+        print(index, '---', nome_head,'(',head,')', '--->', degree_node(head), '---',relation,'---', nome_tail,'(',tail,')', '--->', degree_node(tail),'WN18RR')
         print(' ')
-#print(df_train237[df_train237['head'] == intersection.loc[17018, :]['head']].shape[0])
-#print(intersection.loc[ 17018, : ])
+    elif degreeheadRR == 0:
+        node_0_degree_set.add(head)
+    else:
+        node_0_degree_set.add(tail)
+
 
 
