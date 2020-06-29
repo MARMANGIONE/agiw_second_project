@@ -45,13 +45,12 @@ worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head + mean_
 print(worst_result_head.shape[0])
 print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)) #prendo da intersection le righe peggiori
 # CONSIDERO SOLO I CASI PEGGIORI CHE NON HANNO L'INVERSA(Queste righe possono essere opportunamente commentate se si vogliono considerare anche i casi con inverso
-#  LO FACCIAMO PRIMA O DOPO IL SORT????
-worst_result_tail = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)
-worst_result_head = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_head.index.tolist(),:],df_train)
 worst_result_tail = worst_result_tail.sort_values(ascending=False)
 worst_result_head = worst_result_head.sort_values(ascending=False)
-worst_result_head = worst_result_head.sample(n=200)
-worst_result_tail = worst_result_tail.sample(n=200)
+worst_result_tail = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)
+worst_result_head = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_head.index.tolist(),:],df_train)
+worst_result_head = worst_result_head.sample(n=20)
+worst_result_tail = worst_result_tail.sample(n=20)
 print(worst_result_tail)
 # print(worst_result_head)
 index_list = worst_result_tail.index.values.tolist()
