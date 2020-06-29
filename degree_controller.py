@@ -70,7 +70,17 @@ print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.
 worst_result_tail = worst_result_tail.sort_values(ascending=False)
 worst_result_head = worst_result_head.sort_values(ascending=False)
 worst_result_tail = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)
+
+#GRAPH FOR TAIL
+serieDifferenze_tail2 = worst_result_tail['tail_rank_2'] - worst_result_tail['tail_rank']
+bar_chart_different_ranks(serieDifferenze_tail2)
+
+
 worst_result_head = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_head.index.tolist(),:],df_train)
+#GRAPH FOR HEAD
+serieDifferenze_head2 = worst_result_head['head_rank_2'] - worst_result_head['head_rank']
+bar_chart_different_ranks(serieDifferenze_head2)
+
 worst_result_head = worst_result_head.sample(n=20)
 worst_result_tail = worst_result_tail.sample(n=20)
 print(worst_result_tail)
