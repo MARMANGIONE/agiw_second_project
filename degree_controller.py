@@ -3,6 +3,10 @@ import requests
 from bs4 import BeautifulSoup
 import dfs_portatile
 import check_reverse_fact
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
 df = pd.read_csv('data/FB15k/ComplEx/complex_filtered_ranks.csv', sep=';',
                  names=['head', 'relation', 'tail', 'head_rank', 'tail_rank'])
 df2 = pd.read_csv('data/FB15k-237/ComplEx/complex_filtered_ranks.csv', sep=';',
@@ -23,6 +27,16 @@ def recover_name_fb15k(node):
     h1 = soup.find_all('h1')
     return h1[0].text
 
+def bar_chart_different_ranks(serieDifferenze):
+    # GRAPH FOR TAIL
+    bins = [0, 50, 100, 150, 200, 250, 300, 350, 400, 500, 550, 600, 650, 700, 750]
+    out = pd.cut(serieDifferenze, bins=bins, include_lowest=True)
+    ax = out.value_counts(sort=False).plot.bar(rot=0, color="b")
+    plt.tick_params(labelsize=9)
+    group_labels = ['50', '100', '150', '200', '250', '300', '350', '400', '450', '500', '550', '600', '650', '700']
+    ax.set_xticklabels(group_labels)
+    plt.show()
+
 
 # prendo solo l'intersezione dei due dataframe, in modo che ho solo i fatti presenti nel KG filtrato
 
@@ -30,7 +44,11 @@ intersection = pd.merge(df, df2, how='inner', on=['head', 'relation', 'tail'])
 # seleziono le righe che hanno head rank o tail rank differenti
 different_ranks = intersection[(intersection['head_rank'] != intersection['head_rank_2'])
                                | (intersection['tail_rank'] != intersection['tail_rank_2'])]
-serieDifferenze_tail = different_ranks['tail_rank_2'] - different_ranks['tail_rank']  # faccio la differenza tra il tail rank del KG filtrato meno il tail rank del KG non filtrato
+serieDifferenze_tail = different_ranks['tail_rank_2'] - different_ranks['tail_rank'] # faccio la differenza tra il tail rank del KG filtrato meno il tail rank del KG non filtrato
+
+# GRAPH FOR TAIL
+bar_chart_different_ranks(serieDifferenze_tail)
+
 stdTail = pd.DataFrame.std(
     different_ranks['tail_rank_2'] - different_ranks['tail_rank'])  # calcolo la deviazione standard
 meanTail = pd.DataFrame.mean(different_ranks['tail_rank_2'] - different_ranks['tail_rank'])
@@ -39,6 +57,10 @@ worst_result_tail = serieDifferenze_tail[
 
 # faccio lo stesso per le head
 serieDifferenze_head = different_ranks['head_rank_2'] - different_ranks['head_rank']
+
+#GRAPH FOR HEAD
+bar_chart_different_ranks(serieDifferenze_head)
+
 std_head = pd.DataFrame.std(different_ranks['head_rank_2'] - different_ranks['head_rank'])
 mean_head = pd.DataFrame.mean(different_ranks['head_rank_2'] - different_ranks['head_rank'])
 worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head + mean_head]
