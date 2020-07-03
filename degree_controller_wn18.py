@@ -60,29 +60,17 @@ worst_result_tail = serieDifferenze_tail[
 # faccio lo stesso per le head
 serieDifferenze_head = different_ranks['head_rank_2'] - different_ranks['head_rank']
 
-#GRAPH FOR HEAD
-bar_chart_different_ranks(serieDifferenze_head)
 
 std_head = pd.DataFrame.std(different_ranks['head_rank_2'] - different_ranks['head_rank'])
 mean_head = pd.DataFrame.mean(different_ranks['head_rank_2'] - different_ranks['head_rank'])
 worst_result_head = serieDifferenze_head[serieDifferenze_head > std_head + mean_head]
-print(worst_result_head.shape[0])
-print(check_reverse_fact.count_reverse_fact(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)) #prendo da intersection le righe peggiori
 # CONSIDERO SOLO I CASI PEGGIORI CHE NON HANNO L'INVERSA(Queste righe possono essere opportunamente commentate se si vogliono considerare anche i casi con inverso
 worst_result_tail = worst_result_tail.sort_values(ascending=False)
 worst_result_head = worst_result_head.sort_values(ascending=False)
 worst_result_tail = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_tail.index.tolist(),:],df_train)
 
-#GRAPH FOR TAIL
-serieDifferenze_tail2 = worst_result_tail['tail_rank_2'] - worst_result_tail['tail_rank']
-bar_chart_different_ranks(serieDifferenze_tail2)
-
-
 worst_result_head = check_reverse_fact.df_without_reverse(intersection.iloc[worst_result_head.index.tolist(),:],df_train)
-#GRAPH FOR HEAD
-serieDifferenze_head2 = worst_result_head['head_rank_2'] - worst_result_head['head_rank']
-bar_chart_different_ranks(serieDifferenze_head2)
-print(worst_result_tail)
+
 # print(worst_result_head)
 index_list = worst_result_tail.index.values.tolist()
 for index in index_list:
@@ -91,14 +79,13 @@ for index in index_list:
     relation = intersection.loc[index, :]['relation']
     degreeheadrr = degree_rr(head)
     degreetailrr = degree_rr(tail)
-    if 1 <= degreeheadrr <= 30 and 1 <= degreetailrr <= 30:
-        # and nome_head != '❔' and nome_tail != '❔'
-        nome_head = recover_name_wn18(head)
-        nome_tail = recover_name_wn18(tail)
-        print(index, '---', nome_head, '(', head, ')', 'degree', degreeheadrr, '--->',
-              relation, '--->', nome_tail, '(', tail, ')', 'degree', degreetailrr, 'WN18RR', 'paths', dfs_portatile.partenza_dfs(head, tail, df_train_rr, 2, 2))
-        print(index, '---', nome_head, '(', head, ')', 'degree', degree(head), '--->',
-              relation, '--->', nome_tail, '(', tail, ')', 'degree', degree(tail), 'WN18')
-        print('')
+    # and nome_head != '❔' and nome_tail != '❔'
+    nome_head = recover_name_wn18(head)
+    nome_tail = recover_name_wn18(tail)
+    print(index, '---', nome_head, '(', head, ')', 'degree', degreeheadrr, '--->',
+          relation, '--->', nome_tail, '(', tail, ')', 'degree', degreetailrr, 'WN18RR', 'paths', dfs_portatile.partenza_dfs(head, tail, df_train_rr, 4, 4))
+    print(index, '---', nome_head, '(', head, ')', 'degree', degree(head), '--->',
+          relation, '--->', nome_tail, '(', tail, ')', 'degree', degree(tail), 'WN18', 'paths', dfs_portatile.partenza_dfs(head, tail, df_train, 4, 4))
+    print('')
 
 
