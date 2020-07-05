@@ -3,6 +3,7 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from dfs_portatile_filtered import partenza_dfs
 
 def recover_name_fb15k(node):
     html_doc = requests.get('https://cofactor.io/'+ node).text
@@ -36,9 +37,9 @@ def test_magic_dfs():
 
 
 
-with open("output/pathFB15k.txt", "r") as file:
-    paths = eval(file.readline())
+#with open("output/pathFB15k.txt", "r") as file:
+ #   paths = eval(file.readline())
 
 df = pd.read_csv('data/FB15k-237/train_FB15k-237.csv', sep='\t', names=['head', 'relation', 'tail'])
-
+paths = partenza_dfs('/m/0bxtg','/m/09nqf',df,3,3)
 test_magic_dfs()

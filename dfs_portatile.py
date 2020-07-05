@@ -1,4 +1,3 @@
-# metodo per calcolare tutti i path in modo efficiente
 # effettuo 2 dfs, una che parte dal nodo head e un'altra che parte dal nodo tail rispettando comunque il verso delle relazioni
 
 import pandas as pd
@@ -8,9 +7,9 @@ starttime = datetime.now()
 
 
 def creaInversi():
-    with open("data/FB15k-237/train_FB15k-237.csv") as f:
+    with open("data/WN18/train_WN18.csv") as f:
         lines = f.readlines()
-    CSVinv = open("data/FB15k-237/train_FB15k-237-inv.csv", 'w')
+    CSVinv = open("data/WN18/train_WN18-inv.csv", 'w')
 
     for line in lines:
         CSVinv.write(line)
@@ -27,9 +26,9 @@ def creaInversi():
 
 
 def partenza_dfs(head,tail,df,DEEPdfs,DEEPreversedfs):
-    if(not os.path.isfile("data/FB15k-237/train_FB15k-237-inv.csv")):
+    if(not os.path.isfile("data/WN18/train_WN18-inv.csv")):
         creaInversi()
-    df=pd.read_csv('data/FB15k-237/train_FB15k-237-inv.csv', sep='\t', names=['head', 'relation', 'tail'])
+    df=pd.read_csv('data/WN18/train_WN18-inv.csv', sep='\t', names=['head', 'relation', 'tail'])
     start = ('', '', head)
     stop = ('', '', tail)
     paths = []
